@@ -142,7 +142,6 @@ class AudioplayerActivity : BaseActivity() {
             finish()
             return
         }
-        logcat { "hello" }
         viewModel.saveCurrentChapterWatchingProgress()
         lifecycleScope.launchNonCancellable {
             viewModel.mutableState.update {
@@ -356,7 +355,6 @@ class AudioplayerActivity : BaseActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
-        logcat { "wowwie" }
         registerSecureActivity(this)
         overridePendingTransition(R.anim.shared_axis_x_push_enter, R.anim.shared_axis_x_push_exit)
         Utils.copyAssets(this)
@@ -906,7 +904,6 @@ class AudioplayerActivity : BaseActivity() {
             // preventing useless busywork
             MPVLib.command(arrayOf("stop"))
         } else if (!shouldBackground) {
-            logcat { "test" }
             player.paused = true
         }
 
@@ -1822,7 +1819,6 @@ class AudioplayerActivity : BaseActivity() {
     // mpv events
 
     internal fun eventPropertyUi(property: String, value: Long) {
-        if (!activityIsForeground) return
         when (property) {
             "demuxer-cache-time" -> playerControls.updateBufferPosition(value.toInt())
             "time-pos" -> {
