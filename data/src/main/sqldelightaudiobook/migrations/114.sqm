@@ -1,0 +1,150 @@
+DROP INDEX IF EXISTS chapters_audiobook_id_index;
+DROP INDEX IF EXISTS chapters_unread_by_audiobook_index;
+DROP INDEX IF EXISTS audiobookhistory_history_chapter_id_index;
+DROP INDEX IF EXISTS library_favorite_index;
+DROP INDEX IF EXISTS audiobooks_url_index;
+
+ALTER TABLE audiobooks RENAME TO audiobook_temp;
+CREATE TABLE audiobooks(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    source INTEGER NOT NULL,
+    url TEXT NOT NULL,
+    artist TEXT,
+    author TEXT,
+    description TEXT,
+    genre TEXT,
+    title TEXT NOT NULL,
+    status INTEGER NOT NULL,
+    thumbnail_url TEXT,
+    favorite INTEGER NOT NULL,
+    last_update INTEGER AS Long,
+    next_update INTEGER AS Long,
+    initialized INTEGER AS Boolean NOT NULL,
+    viewer INTEGER NOT NULL,
+    chapter_flags INTEGER NOT NULL,
+    cover_last_modified INTEGER AS Long NOT NULL,
+    date_added INTEGER AS Long NOT NULL
+);
+INSERT INTO audiobooks
+SELECT _id,source,url,artist,author,description,genre,title,status,thumbnail_url,favorite,last_update,next_update,initialized,viewer,chapter_flags,cover_last_modified,date_added
+FROM audiobook_temp;
+
+ALTER TABLE categories RENAME TO categories_temp;
+CREATE TABLE categories(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    sort INTEGER NOT NULL,
+    flags INTEGER NOT NULL
+);
+INSERT INTO categories
+SELECT _id,name,sort,flags
+FROM categories_temp;
+
+ALTER TABLE chapters RENAME TO chapters_temp;
+CREATE TABLE chapters(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    audiobook_id INTEGER NOT NULL,
+    url TEXT NOT NULL,
+    name TEXT NOT NULL,
+    scanlator TEXT,
+    read INTEGER AS Boolean NOT NULL,
+    bookmark INTEGER AS Boolean NOT NULL,
+    last_second_read INTEGER NOT NULL,
+    total_seconds INTEGER NOT NULL,
+    chapter_number REAL AS Float NOT NULL,
+    source_order INTEGER NOT NULL,
+    date_fetch INTEGER AS Long NOT NULL,
+    date_upload INTEGER AS Long NOT NULL,
+    FOREIGN KEY(audiobook_id) REFERENCES audiobooks (_id)
+    ON DELETE CASCADE
+);
+INSERT INTO chapters
+SELECT _id,audiobook_id,url,name,scanlator,read,bookmark,last_second_read,total_seconds,chapter_number,source_order,date_fetch,date_upload
+FROM chapters_temp;
+
+ALTER TABLE audiobookhistory RENAME TO audiobookhistory_temp;
+CREATE TABLE audiobookhistory(
+    audiobookhistory_id INTEGER NOT NULL PRIMARY KEY,
+    audiobookhistory_chapter_id INTEGER NOT NULL UNIQUE,
+    audiobookhistory_last_read INTEGER AS Long,
+    audiobookhistory_time_read INTEGER AS Long,
+    FOREIGN KEY(audiobookhistory_chapter_id) REFERENCES chapters (_id)
+    ON DELETE CASCADE
+);
+INSERT INTO audiobookhistory
+SELECT audiobookhistory_id, audiobookhistory_chapter_id, audiobookhistory_last_read, audiobookhistory_time_read
+FROM audiobookhistory_temp;
+
+ALTER TABLE audiobooks_categories RENAME TO audiobooks_categories_temp;
+CREATE TABLE audiobooks_categories(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    audiobook_id INTEGER NOT NULL,
+    category_id INTEGER NOT NULL,
+    FOREIGN KEY(category_id) REFERENCES categories (_id)
+    ON DELETE CASCADE,
+    FOREIGN KEY(audiobook_id) REFERENCES audiobooks (_id)
+    ON DELETE CASCADE
+);
+INSERT INTO audiobooks_categories
+SELECT _id, audiobook_id, category_id
+FROM audiobooks_categories_temp;
+
+ALTER TABLE audiobook_sync RENAME TO audiobook_sync_temp;
+CREATE TABLE audiobook_sync(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    audiobook_id INTEGER NOT NULL,
+    sync_id INTEGER NOT NULL,
+    remote_id INTEGER NOT NULL,
+    library_id INTEGER,
+    title TEXT NOT NULL,
+    last_chapter_read REAL NOT NULL,
+    total_chapters INTEGER NOT NULL,
+    status INTEGER NOT NULL,
+    score REAL AS Float NOT NULL,
+    remote_url TEXT NOT NULL,
+    start_date INTEGER AS Long NOT NULL,
+    finish_date INTEGER AS Long NOT NULL,
+    UNIQUE (audiobook_id, sync_id) ON CONFLICT REPLACE,
+    FOREIGN KEY(audiobook_id) REFERENCES audiobooks (_id)
+    ON DELETE CASCADE
+);
+INSERT INTO audiobook_sync
+SELECT _id, audiobook_id, sync_id, remote_id, library_id, title, last_chapter_read, total_chapters, status, score, remote_url, start_date, finish_date
+FROM audiobook_sync_temp;
+
+CREATE INDEX chapters_audiobook_id_index ON chapters(audiobook_id);
+CREATE INDEX chapters_unread_by_audiobook_index ON chapters(audiobook_id, read) WHERE read = 0;
+CREATE INDEX audiobookhistory_history_chapter_id_index ON audiobookhistory(audiobookhistory_chapter_id);
+CREATE INDEX library_favorite_index ON audiobooks(favorite) WHERE favorite = 1;
+CREATE INDEX audiobooks_url_index ON audiobooks(url);
+
+CREATE VIEW IF NOT EXISTS audiobookhistoryView AS
+SELECT
+audiobookhistory.audiobookhistory_id AS id,
+audiobooks._id AS audiobookId,
+chapters._id AS chapterId,
+audiobooks.title,
+audiobooks.thumbnail_url AS thumbnailUrl,
+chapters.chapter_number AS chapterNumber,
+audiobookhistory.audiobookhistory_last_read AS readAt,
+max_last_read.audiobookhistory_last_read AS maxReadAt,
+max_last_read.history_chapter_id AS maxReadAtChapterId
+FROM audiobooks
+JOIN chapters
+ON audiobooks._id = chapters.audiobook_id
+JOIN audiobookhistory
+ON chapters._id = audiobookhistory.audiobookhistory_chapter_id
+JOIN (
+SELECT chapters.audiobook_id,chapters._id AS history_chapter_id, MAX(audiobookhistory.audiobookhistory_last_read) AS audiobookhistory_last_read
+FROM chapters JOIN audiobookhistory
+ON chapters._id = audiobookhistory.audiobookhistory_chapter_id
+GROUP BY chapters.audiobook_id
+) AS max_last_read
+ON chapters.audiobook_id = max_last_read.audiobook_id;
+
+DROP TABLE IF EXISTS audiobook_sync_temp;
+DROP TABLE IF EXISTS audiobooks_categories_temp;
+DROP TABLE IF EXISTS audiobookhistory_temp;
+DROP TABLE IF EXISTS chapters_temp;
+DROP TABLE IF EXISTS categories_temp;
+DROP TABLE IF EXISTS audiobook_temp;

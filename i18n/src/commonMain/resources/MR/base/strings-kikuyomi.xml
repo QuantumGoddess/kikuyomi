@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="local_audiobook_source">Local audiobook source</string>
+    <string name="choose_audio_quality">Choose audio quality:</string>
+    <string name="action_show_audiobook">Show audiobook</string>
+    <string name="action_sort_last_audiobook_update">Last audiobook update</string>
+    <string name="copied_audio_link_to_clipboard">Copied audio link to clipboard</string>
+    <string name="audio_list_empty_error">No audio found</string>
+    <string name="label_audiobook_extensions">Audiobook Extensions</string>
+    <string name="label_migration_audiobook">Migrate Audiobooks</string>
+    <string name="label_audiobook_sources">Audiobook Sources</string>
+    <string name="label_audiobook_library">Audiobooks</string>
+    <string name="snack_add_to_audiobook_library">Add audiobook to library?</string>
+    <string name="information_no_recent_audiobook">Nothing listened recently</string>
+    <string name="label_audiobook_history">Audiobooks</string>
+    <string name="label_audiobook_updates">Audiobooks</string>
+    <string name="audiobook_chapter_progress">Progress: %1$s/%2$s</string>
+
+</resources>

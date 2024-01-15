@@ -52,7 +52,7 @@ class PictureInPictureHandler(
             PendingIntent.getBroadcast(
                 activity,
                 requestCode,
-                Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, controlType),
+                Intent(eu.kanade.tachiyomi.ui.audioplayer.viewer.ACTION_MEDIA_CONTROL).putExtra(eu.kanade.tachiyomi.ui.audioplayer.viewer.EXTRA_CONTROL_TYPE, controlType),
                 PendingIntent.FLAG_IMMUTABLE,
             ),
         )
@@ -85,38 +85,38 @@ class PictureInPictureHandler(
                         createRemoteAction(
                             R.drawable.ic_skip_previous_24dp,
                             MR.strings.action_previous_episode,
-                            PIP_PREVIOUS,
-                            PIP_PREVIOUS,
+                            eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_PREVIOUS,
+                            eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_PREVIOUS,
                             plPos != 0,
                         )
                     } else {
                         createRemoteAction(
                             R.drawable.ic_forward_10_24dp,
                             MR.strings.pref_skip_10,
-                            PIP_SKIP,
-                            PIP_SKIP,
+                            eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_SKIP,
+                            eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_SKIP,
                         )
                     },
                     if (playing) {
                         createRemoteAction(
                             R.drawable.ic_pause_24dp,
                             MR.strings.action_pause,
-                            PIP_PAUSE,
-                            PIP_PAUSE,
+                            eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_PAUSE,
+                            eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_PAUSE,
                         )
                     } else {
                         createRemoteAction(
                             R.drawable.ic_play_arrow_24dp,
                             MR.strings.action_play,
-                            PIP_PLAY,
-                            PIP_PLAY,
+                            eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_PLAY,
+                            eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_PLAY,
                         )
                     },
                     createRemoteAction(
                         R.drawable.ic_skip_next_24dp,
                         MR.strings.action_next_episode,
-                        PIP_NEXT,
-                        PIP_NEXT,
+                        eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_NEXT,
+                        eu.kanade.tachiyomi.ui.audioplayer.viewer.PIP_NEXT,
                         plPos != plCount - 1,
                     ),
                 ),

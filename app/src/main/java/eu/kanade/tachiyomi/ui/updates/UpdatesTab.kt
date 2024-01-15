@@ -15,6 +15,7 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.ui.download.DownloadsTab
 import eu.kanade.tachiyomi.ui.main.MainActivity
 import eu.kanade.tachiyomi.ui.updates.anime.animeUpdatesTab
+import eu.kanade.tachiyomi.ui.updates.audiobook.audiobookUpdatesTab
 import eu.kanade.tachiyomi.ui.updates.manga.mangaUpdatesTab
 import kotlinx.collections.immutable.persistentListOf
 import tachiyomi.i18n.MR
@@ -50,6 +51,7 @@ data class UpdatesTab(
             tabs = persistentListOf(
                 animeUpdatesTab(context, fromMore),
                 mangaUpdatesTab(context, fromMore),
+                audiobookUpdatesTab(context, fromMore),
             ),
         )
 
@@ -61,3 +63,4 @@ data class UpdatesTab(
 
 private const val TAB_ANIME = 0
 private const val TAB_MANGA = 1
+private const val TAB_AUDIOBOOK = 2

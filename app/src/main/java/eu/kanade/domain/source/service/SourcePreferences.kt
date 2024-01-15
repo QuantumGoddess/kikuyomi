@@ -42,13 +42,18 @@ class SourcePreferences(
     // Mixture Sources
 
     fun disabledAnimeSources() = preferenceStore.getStringSet("hidden_anime_catalogues", emptySet())
+    fun disabledAudiobookSources() = preferenceStore.getStringSet("hidden_audiobook_catalogues", emptySet())
     fun disabledMangaSources() = preferenceStore.getStringSet("hidden_catalogues", emptySet())
 
     fun pinnedAnimeSources() = preferenceStore.getStringSet("pinned_anime_catalogues", emptySet())
+    fun pinnedAudiobookSources() = preferenceStore.getStringSet("pinned_audiobook_catalogues", emptySet())
     fun pinnedMangaSources() = preferenceStore.getStringSet("pinned_catalogues", emptySet())
 
     fun lastUsedAnimeSource() = preferenceStore.getLong(
         Preference.appStateKey("last_anime_catalogue_source"),
+        -1,
+    )fun lastUsedAudiobookSource() = preferenceStore.getLong(
+        Preference.appStateKey("last_audiobook_catalogue_source"),
         -1,
     )
     fun lastUsedMangaSource() = preferenceStore.getLong(
@@ -57,10 +62,16 @@ class SourcePreferences(
     )
 
     fun animeExtensionUpdatesCount() = preferenceStore.getInt("animeext_updates_count", 0)
+    fun audiobookExtensionUpdatesCount() = preferenceStore.getInt("audiobookext_updates_count", 0)
     fun mangaExtensionUpdatesCount() = preferenceStore.getInt("ext_updates_count", 0)
 
     fun hideInAnimeLibraryItems() = preferenceStore.getBoolean(
         "browse_hide_in_anime_library_items",
+        false,
+    )
+
+    fun hideInAudiobookLibraryItems() = preferenceStore.getBoolean(
+        "browse_hide_in_audiobook_library_items",
         false,
     )
 

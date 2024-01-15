@@ -1,5 +1,7 @@
 package tachiyomi.domain.items.chapter.model
 
+import tachiyomi.domain.items.chapter.model.Chapter
+
 data class Chapter(
     val id: Long,
     val mangaId: Long,

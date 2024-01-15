@@ -170,7 +170,7 @@ class ExternalIntents {
      */
     private fun getIntentForPackage(pkgName: String, context: Context, uri: Uri, video: Video): Intent {
         return when (pkgName) {
-            WEB_VIDEO_CASTER -> webVideoCasterIntent(pkgName, context, uri, video)
+            eu.kanade.tachiyomi.ui.audioplayer.WEB_VIDEO_CASTER -> webVideoCasterIntent(pkgName, context, uri, video)
             else -> standardIntentForPackage(pkgName, context, uri, video)
         }
     }
@@ -178,7 +178,7 @@ class ExternalIntents {
     private fun webVideoCasterIntent(pkgName: String, context: Context, uri: Uri, video: Video): Intent {
         return Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "video/*")
-            if (isPackageInstalled(pkgName, context.packageManager)) setPackage(WEB_VIDEO_CASTER)
+            if (isPackageInstalled(pkgName, context.packageManager)) setPackage(eu.kanade.tachiyomi.ui.audioplayer.WEB_VIDEO_CASTER)
             addExtrasAndFlags(true, this)
 
             val headers = Bundle()
@@ -300,16 +300,16 @@ class ExternalIntents {
      */
     private fun getComponent(packageName: String): ComponentName? {
         return when (packageName) {
-            MPV_PLAYER -> ComponentName(packageName, "$packageName.MPVActivity")
-            MX_PLAYER, MX_PLAYER_FREE, MX_PLAYER_PRO -> ComponentName(
+            eu.kanade.tachiyomi.ui.audioplayer.MPV_PLAYER -> ComponentName(packageName, "$packageName.MPVActivity")
+            eu.kanade.tachiyomi.ui.audioplayer.MX_PLAYER, eu.kanade.tachiyomi.ui.audioplayer.MX_PLAYER_FREE, eu.kanade.tachiyomi.ui.audioplayer.MX_PLAYER_PRO -> ComponentName(
                 packageName,
                 "$packageName.ActivityScreen",
             )
-            VLC_PLAYER -> ComponentName(packageName, "$packageName.gui.video.VideoPlayerActivity")
-            MPV_REMOTE -> ComponentName(packageName, "$packageName.MainActivity")
-            JUST_PLAYER -> ComponentName(packageName, "$packageName.PlayerActivity")
-            NEXT_PLAYER -> ComponentName(packageName, "$packageName.feature.player.PlayerActivity")
-            X_PLAYER -> ComponentName(packageName, "com.inshot.xplayer.activities.PlayerActivity")
+            eu.kanade.tachiyomi.ui.audioplayer.VLC_PLAYER -> ComponentName(packageName, "$packageName.gui.video.VideoPlayerActivity")
+            eu.kanade.tachiyomi.ui.audioplayer.MPV_REMOTE -> ComponentName(packageName, "$packageName.MainActivity")
+            eu.kanade.tachiyomi.ui.audioplayer.JUST_PLAYER -> ComponentName(packageName, "$packageName.PlayerActivity")
+            eu.kanade.tachiyomi.ui.audioplayer.NEXT_PLAYER -> ComponentName(packageName, "$packageName.feature.player.PlayerActivity")
+            eu.kanade.tachiyomi.ui.audioplayer.X_PLAYER -> ComponentName(packageName, "com.inshot.xplayer.activities.PlayerActivity")
             else -> null
         }
     }

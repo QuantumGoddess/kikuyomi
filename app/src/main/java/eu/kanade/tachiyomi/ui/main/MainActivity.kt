@@ -66,31 +66,41 @@ import eu.kanade.presentation.util.DefaultNavigatorScreenTransition
 import eu.kanade.tachiyomi.BuildConfig
 import eu.kanade.tachiyomi.Migrations
 import eu.kanade.tachiyomi.animesource.model.Video
+import eu.kanade.tachiyomi.audiobooksource.model.Audio
 import eu.kanade.tachiyomi.core.Constants
+import eu.kanade.tachiyomi.data.cache.AudiobookChapterCache
 import eu.kanade.tachiyomi.data.cache.ChapterCache
 import eu.kanade.tachiyomi.data.cache.EpisodeCache
 import eu.kanade.tachiyomi.data.download.anime.AnimeDownloadCache
+import eu.kanade.tachiyomi.data.download.audiobook.AudiobookDownloadCache
 import eu.kanade.tachiyomi.data.download.manga.MangaDownloadCache
 import eu.kanade.tachiyomi.data.notification.NotificationReceiver
 import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
 import eu.kanade.tachiyomi.data.updater.RELEASE_URL
 import eu.kanade.tachiyomi.extension.anime.api.AnimeExtensionGithubApi
+import eu.kanade.tachiyomi.extension.audiobook.api.AudiobookExtensionGithubApi
 import eu.kanade.tachiyomi.extension.manga.api.MangaExtensionGithubApi
 import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
 import eu.kanade.tachiyomi.ui.browse.anime.source.browse.BrowseAnimeSourceScreen
 import eu.kanade.tachiyomi.ui.browse.anime.source.globalsearch.GlobalAnimeSearchScreen
+import eu.kanade.tachiyomi.ui.browse.audiobook.source.browse.BrowseAudiobookSourceScreen
+import eu.kanade.tachiyomi.ui.browse.audiobook.source.globalsearch.GlobalAudiobookSearchScreen
 import eu.kanade.tachiyomi.ui.browse.manga.source.browse.BrowseMangaSourceScreen
 import eu.kanade.tachiyomi.ui.browse.manga.source.globalsearch.GlobalMangaSearchScreen
 import eu.kanade.tachiyomi.ui.deeplink.DeepLinkScreenType
 import eu.kanade.tachiyomi.ui.deeplink.anime.DeepLinkAnimeScreen
+import eu.kanade.tachiyomi.ui.deeplink.audiobook.DeepLinkAudiobookScreen
 import eu.kanade.tachiyomi.ui.deeplink.manga.DeepLinkMangaScreen
 import eu.kanade.tachiyomi.ui.entries.anime.AnimeScreen
+import eu.kanade.tachiyomi.ui.entries.audiobook.AudiobookScreen
 import eu.kanade.tachiyomi.ui.entries.manga.MangaScreen
 import eu.kanade.tachiyomi.ui.home.HomeScreen
 import eu.kanade.tachiyomi.ui.more.NewUpdateScreen
 import eu.kanade.tachiyomi.ui.more.OnboardingScreen
 import eu.kanade.tachiyomi.ui.player.ExternalIntents
+import eu.kanade.tachiyomi.ui.audioplayer.ExternalIntents as AudioExternalIntents
 import eu.kanade.tachiyomi.ui.player.PlayerActivity
+import eu.kanade.tachiyomi.ui.audioplayer.AudioplayerActivity
 import eu.kanade.tachiyomi.util.system.dpToPx
 import eu.kanade.tachiyomi.util.system.isNavigationBarNeedsScrim
 import eu.kanade.tachiyomi.util.system.openInBrowser
@@ -127,9 +137,11 @@ class MainActivity : BaseActivity() {
     private val preferences: BasePreferences by injectLazy()
 
     private val animeDownloadCache: AnimeDownloadCache by injectLazy()
+    private val audiobookDownloadCache: AudiobookDownloadCache by injectLazy()
     private val downloadCache: MangaDownloadCache by injectLazy()
     private val chapterCache: ChapterCache by injectLazy()
     private val episodeCache: EpisodeCache by injectLazy()
+    private val audiobookChapterCache: AudiobookChapterCache by injectLazy()
 
     // To be checked by splash screen. If true then splash screen will be removed.
     var ready = false
@@ -182,12 +194,13 @@ class MainActivity : BaseActivity() {
             val downloadOnly by preferences.downloadedOnly().collectAsState()
             val indexing by downloadCache.isInitializing.collectAsState()
             val indexingAnime by animeDownloadCache.isInitializing.collectAsState()
+            val indexingAudiobook by audiobookDownloadCache.isInitializing.collectAsState()
 
             // Set status bar color considering the top app state banner
             val systemUiController = rememberSystemUiController()
             val isSystemInDarkTheme = isSystemInDarkTheme()
             val statusBarBackgroundColor = when {
-                indexing || indexingAnime -> IndexingBannerBackgroundColor
+                indexing || indexingAnime || indexingAudiobook -> IndexingBannerBackgroundColor
                 downloadOnly -> DownloadedOnlyBannerBackgroundColor
                 incognito -> IncognitoModeBannerBackgroundColor
                 else -> MaterialTheme.colorScheme.surface
@@ -242,7 +255,7 @@ class MainActivity : BaseActivity() {
                         AppStateBanners(
                             downloadedOnlyMode = downloadOnly,
                             incognitoMode = incognito,
-                            indexing = indexing || indexingAnime,
+                            indexing = indexing || indexingAnime || indexingAudiobook,
                             modifier = Modifier.windowInsetsPadding(scaffoldInsets),
                         )
                     },
@@ -273,6 +286,10 @@ class MainActivity : BaseActivity() {
                                 (
                                     currentScreen is BrowseAnimeSourceScreen ||
                                         (currentScreen is AnimeScreen && currentScreen.fromSource)
+                                    ) ||
+                                (
+                                    currentScreen is BrowseAudiobookSourceScreen ||
+                                        (currentScreen is AudiobookScreen && currentScreen.fromSource)
                                     )
                             ) {
                                 navigator.popUntilRoot()
@@ -321,6 +338,7 @@ class MainActivity : BaseActivity() {
             lifecycleScope.launchIO {
                 chapterCache.clear()
                 episodeCache.clear()
+                audiobookChapterCache.clear()
             }
         }
 
@@ -384,6 +402,7 @@ class MainActivity : BaseActivity() {
             try {
                 MangaExtensionGithubApi().checkForUpdates(context)
                 AnimeExtensionGithubApi().checkForUpdates(context)
+                AudiobookExtensionGithubApi().checkForUpdates(context)
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e)
             }
@@ -456,6 +475,7 @@ class MainActivity : BaseActivity() {
 
         val tabToOpen = when (intent.action) {
             Constants.SHORTCUT_ANIMELIB -> HomeScreen.Tab.Animelib()
+            Constants.SHORTCUT_AUDIOBOOKLIB -> HomeScreen.Tab.Audiobooklib()
             Constants.SHORTCUT_LIBRARY -> HomeScreen.Tab.Library()
             Constants.SHORTCUT_MANGA -> {
                 val idToOpen = intent.extras?.getLong(Constants.MANGA_EXTRA) ?: return false
@@ -467,6 +487,11 @@ class MainActivity : BaseActivity() {
                 navigator.popUntilRoot()
                 HomeScreen.Tab.Animelib(idToOpen)
             }
+            Constants.SHORTCUT_AUDIOBOOK -> {
+                val idToOpen = intent.extras?.getLong(Constants.AUDIOBOOK_EXTRA) ?: return false
+                navigator.popUntilRoot()
+                HomeScreen.Tab.Audiobooklib(idToOpen)
+            }
             Constants.SHORTCUT_UPDATES -> HomeScreen.Tab.Updates
             Constants.SHORTCUT_HISTORY -> HomeScreen.Tab.History
             Constants.SHORTCUT_SOURCES -> HomeScreen.Tab.Browse(false)
@@ -476,6 +501,10 @@ class MainActivity : BaseActivity() {
                 HomeScreen.Tab.More(toDownloads = true)
             }
             Constants.SHORTCUT_ANIME_DOWNLOADS -> {
+                navigator.popUntilRoot()
+                HomeScreen.Tab.More(toDownloads = true)
+            }
+            Constants.SHORTCUT_AUDIOBOOK_DOWNLOADS -> {
                 navigator.popUntilRoot()
                 HomeScreen.Tab.More(toDownloads = true)
             }
@@ -503,6 +532,10 @@ class MainActivity : BaseActivity() {
                             navigator.push(GlobalAnimeSearchScreen(query))
                             navigator.push(DeepLinkAnimeScreen(query))
                         }
+                        DeepLinkScreenType.AUDIOBOOK -> {
+                            navigator.push(GlobalAudiobookSearchScreen(query))
+                            navigator.push(DeepLinkAudiobookScreen(query))
+                        }
                     }
                 }
                 null
@@ -525,6 +558,15 @@ class MainActivity : BaseActivity() {
                 }
                 null
             }
+            INTENT_AUDIOBOOKSEARCH -> { // Same as above
+                val query = intent.getStringExtra(INTENT_SEARCH_QUERY)
+                if (!query.isNullOrEmpty()) {
+                    val filter = intent.getStringExtra(INTENT_SEARCH_FILTER)
+                    navigator.popUntilRoot()
+                    navigator.push(GlobalAudiobookSearchScreen(query, filter))
+                }
+                null
+            }
             else -> return false
         }
 
@@ -539,6 +581,7 @@ class MainActivity : BaseActivity() {
     companion object {
         const val INTENT_SEARCH = "eu.kanade.tachiyomi.SEARCH"
         const val INTENT_ANIMESEARCH = "eu.kanade.tachiyomi.ANIMESEARCH"
+        const val INTENT_AUDIOBOOKSEARCH = "eu.kanade.tachiyomi.AUDIOBOOKSEARCH"
         const val INTENT_SEARCH_QUERY = "query"
         const val INTENT_SEARCH_FILTER = "filter"
         const val INTENT_SEARCH_TYPE = "type"
@@ -563,6 +606,27 @@ class MainActivity : BaseActivity() {
                 externalPlayerResult?.launch(intent) ?: return
             } else {
                 context.startActivity(PlayerActivity.newIntent(context, animeId, episodeId))
+            }
+        }
+
+        suspend fun startAudioPlayerActivity(
+            context: Context,
+            audiobookId: Long,
+            chapterId: Long,
+            extPlayer: Boolean,
+            audio: Audio? = null,
+        ) {
+            if (extPlayer) {
+                val intent = try {
+                    AudioExternalIntents.newIntent(context, audiobookId, chapterId, audio)
+                } catch (e: Exception) {
+                    logcat(LogPriority.ERROR, e)
+                    withUIContext { Injekt.get<Application>().toast(e.message) }
+                    return
+                }
+                externalPlayerResult?.launch(intent) ?: return
+            } else {
+                context.startActivity(AudioplayerActivity.newIntent(context, audiobookId, chapterId))
             }
         }
     }

@@ -1,0 +1,65 @@
+import java.util.Date;
+
+CREATE TABLE audiobookhistory(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    chapter_id INTEGER NOT NULL UNIQUE,
+    last_read INTEGER AS Date,
+    FOREIGN KEY(chapter_id) REFERENCES chapters (_id)
+    ON DELETE CASCADE
+);
+
+CREATE INDEX audiobookhistory_history_chapter_id_index ON audiobookhistory(chapter_id);
+
+getHistoryByAudiobookId:
+SELECT
+H._id,
+H.chapter_id,
+H.last_read
+FROM audiobookhistory H
+JOIN chapters EP
+ON H.chapter_id = EP._id
+WHERE EP.audiobook_id = :audiobookId AND EP._id = H.chapter_id;
+
+getHistoryByChapterUrl:
+SELECT
+H._id,
+H.chapter_id,
+H.last_read
+FROM audiobookhistory H
+JOIN chapters EP
+ON H.chapter_id = EP._id
+WHERE EP.url = :chapterUrl AND EP._id = H.chapter_id;
+
+resetAudiobookHistoryById:
+UPDATE audiobookhistory
+SET last_read = 0
+WHERE _id = :historyId;
+
+resetHistoryByAudiobookId:
+UPDATE audiobookhistory
+SET last_read = 0
+WHERE _id IN (
+    SELECT H._id
+    FROM audiobooks M
+    INNER JOIN chapters EP
+    ON M._id = EP.audiobook_id
+    INNER JOIN audiobookhistory H
+    ON EP._id = H.chapter_id
+    WHERE M._id = :audiobookId
+);
+
+removeAllHistory:
+DELETE FROM audiobookhistory;
+
+removeResettedHistory:
+DELETE FROM audiobookhistory
+WHERE last_read = 0;
+
+upsert:
+INSERT INTO audiobookhistory(chapter_id, last_read)
+VALUES (:chapterId, :readAt)
+ON CONFLICT(chapter_id)
+DO UPDATE
+SET
+    last_read = :readAt
+WHERE chapter_id = :chapterId;

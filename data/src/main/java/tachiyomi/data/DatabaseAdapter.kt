@@ -2,6 +2,7 @@ package tachiyomi.data
 
 import app.cash.sqldelight.ColumnAdapter
 import eu.kanade.tachiyomi.animesource.model.AnimeUpdateStrategy
+import eu.kanade.tachiyomi.audiobooksource.model.AudiobookUpdateStrategy
 import eu.kanade.tachiyomi.source.model.UpdateStrategy
 import java.util.Date
 
@@ -35,4 +36,11 @@ object AnimeUpdateStrategyColumnAdapter : ColumnAdapter<AnimeUpdateStrategy, Lon
         AnimeUpdateStrategy.entries.getOrElse(databaseValue.toInt()) { AnimeUpdateStrategy.ALWAYS_UPDATE }
 
     override fun encode(value: AnimeUpdateStrategy): Long = value.ordinal.toLong()
+}
+
+object AudiobookUpdateStrategyColumnAdapter : ColumnAdapter<AudiobookUpdateStrategy, Long> {
+    override fun decode(databaseValue: Long): AudiobookUpdateStrategy =
+        AudiobookUpdateStrategy.entries.getOrElse(databaseValue.toInt()) { AudiobookUpdateStrategy.ALWAYS_UPDATE }
+
+    override fun encode(value: AudiobookUpdateStrategy): Long = value.ordinal.toLong()
 }

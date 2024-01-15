@@ -8,6 +8,7 @@ import eu.kanade.domain.ui.UiPreferences
 import eu.kanade.tachiyomi.core.preference.AndroidPreferenceStore
 import eu.kanade.tachiyomi.core.security.SecurityPreferences
 import eu.kanade.tachiyomi.network.NetworkPreferences
+import eu.kanade.tachiyomi.ui.audioplayer.settings.AudioplayerPreferences
 import eu.kanade.tachiyomi.ui.player.settings.PlayerPreferences
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderPreferences
 import eu.kanade.tachiyomi.util.system.isDevFlavor
@@ -47,6 +48,9 @@ class PreferenceModule(val app: Application) : InjektModule {
         }
         addSingletonFactory {
             PlayerPreferences(get())
+        }
+        addSingletonFactory {
+            AudioplayerPreferences(get())
         }
         addSingletonFactory {
             TrackPreferences(get())

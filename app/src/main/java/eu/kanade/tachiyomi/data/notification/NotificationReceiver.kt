@@ -28,12 +28,17 @@ import tachiyomi.core.util.lang.launchIO
 import tachiyomi.domain.download.service.DownloadPreferences
 import tachiyomi.domain.entries.anime.interactor.GetAnime
 import tachiyomi.domain.entries.anime.model.Anime
+import tachiyomi.domain.entries.audiobook.model.Audiobook
 import tachiyomi.domain.entries.manga.interactor.GetManga
 import tachiyomi.domain.entries.manga.model.Manga
 import tachiyomi.domain.items.chapter.interactor.GetChapter
 import tachiyomi.domain.items.chapter.interactor.UpdateChapter
 import tachiyomi.domain.items.chapter.model.Chapter
 import tachiyomi.domain.items.chapter.model.toChapterUpdate
+import tachiyomi.domain.items.audiobookchapter.interactor.GetChapter as GetAudiobookChapter
+import tachiyomi.domain.items.audiobookchapter.interactor.UpdateChapter as UpdateAudiobookChapter
+import tachiyomi.domain.items.audiobookchapter.model.Chapter as AudiobookChapter
+import tachiyomi.domain.items.audiobookchapter.model.toChapterUpdate as toAudiobookChapterUpdate
 import tachiyomi.domain.items.episode.interactor.GetEpisode
 import tachiyomi.domain.items.episode.interactor.UpdateEpisode
 import tachiyomi.domain.items.episode.model.Episode
@@ -388,6 +393,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
         private const val ACTION_CANCEL_LIBRARY_UPDATE = "$ID.$NAME.CANCEL_LIBRARY_UPDATE"
         private const val ACTION_CANCEL_ANIMELIB_UPDATE = "$ID.$NAME.CANCEL_ANIMELIB_UPDATE"
+        private const val ACTION_CANCEL_AUDIOBOOKLIB_UPDATE = "$ID.$NAME.CANCEL_AUDIOBOOKLIB_UPDATE"
 
         private const val ACTION_START_APP_UPDATE = "$ID.$NAME.ACTION_START_APP_UPDATE"
         private const val ACTION_CANCEL_APP_UPDATE_DOWNLOAD = "$ID.$NAME.CANCEL_APP_UPDATE_DOWNLOAD"
@@ -406,6 +412,10 @@ class NotificationReceiver : BroadcastReceiver() {
         private const val ACTION_RESUME_ANIME_DOWNLOADS = "$ID.$NAME.ACTION_RESUME_ANIME_DOWNLOADS"
         private const val ACTION_PAUSE_ANIME_DOWNLOADS = "$ID.$NAME.ACTION_PAUSE_ANIME_DOWNLOADS"
         private const val ACTION_CLEAR_ANIME_DOWNLOADS = "$ID.$NAME.ACTION_CLEAR_ANIME_DOWNLOADS"
+
+        private const val ACTION_RESUME_AUDIOBOOK_DOWNLOADS = "$ID.$NAME.ACTION_RESUME_AUDIOBOOK_DOWNLOADS"
+        private const val ACTION_PAUSE_AUDIOBOOK_DOWNLOADS = "$ID.$NAME.ACTION_PAUSE_AUDIOBOOK_DOWNLOADS"
+        private const val ACTION_CLEAR_AUDIOBOOK_DOWNLOADS = "$ID.$NAME.ACTION_CLEAR_AUDIOBOOK_DOWNLOADS"
 
         private const val ACTION_DISMISS_NOTIFICATION = "$ID.$NAME.ACTION_DISMISS_NOTIFICATION"
 
@@ -490,6 +500,24 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         /**
+         * Returns a [PendingIntent] that resumes the download of a chapter
+         *
+         * @param context context of application
+         * @return [PendingIntent]
+         */
+        internal fun resumeAudiobookDownloadsPendingBroadcast(context: Context): PendingIntent {
+            val intent = Intent(context, NotificationReceiver::class.java).apply {
+                action = ACTION_RESUME_AUDIOBOOK_DOWNLOADS
+            }
+            return PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        /**
          * Returns [PendingIntent] that pauses the download queue
          *
          * @param context context of application
@@ -508,6 +536,24 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         /**
+         * Returns [PendingIntent] that pauses the download queue
+         *
+         * @param context context of application
+         * @return [PendingIntent]
+         */
+        internal fun pauseAudiobookDownloadsPendingBroadcast(context: Context): PendingIntent {
+            val intent = Intent(context, NotificationReceiver::class.java).apply {
+                action = ACTION_PAUSE_AUDIOBOOK_DOWNLOADS
+            }
+            return PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        /**
          * Returns a [PendingIntent] that clears the download queue
          *
          * @param context context of application
@@ -516,6 +562,24 @@ class NotificationReceiver : BroadcastReceiver() {
         internal fun clearAnimeDownloadsPendingBroadcast(context: Context): PendingIntent {
             val intent = Intent(context, NotificationReceiver::class.java).apply {
                 action = ACTION_CLEAR_ANIME_DOWNLOADS
+            }
+            return PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        /**
+         * Returns a [PendingIntent] that clears the download queue
+         *
+         * @param context context of application
+         * @return [PendingIntent]
+         */
+        internal fun clearAudiobookDownloadsPendingBroadcast(context: Context): PendingIntent {
+            val intent = Intent(context, NotificationReceiver::class.java).apply {
+                action = ACTION_CLEAR_AUDIOBOOK_DOWNLOADS
             }
             return PendingIntent.getBroadcast(
                 context,
@@ -626,6 +690,23 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         /**
+         * Returns [PendingIntent] that starts a watcher activity containing episode.
+         *
+         * @param context context of application
+         * @param anime anime of episode
+         * @param episode episode that needs to be opened
+         */
+        internal fun openAudiobookChapterPendingActivity(context: Context, audiobook: Audiobook, chapter: AudiobookChapter): PendingIntent {
+            val newIntent = PlayerActivity.newIntent(context, audiobook.id, chapter.id)
+            return PendingIntent.getActivity(
+                context,
+                audiobook.id.hashCode(),
+                newIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        /**
          * Returns [PendingIntent] that opens the anime info controller.
          *
          * @param context context of application
@@ -641,6 +722,27 @@ class NotificationReceiver : BroadcastReceiver() {
             return PendingIntent.getActivity(
                 context,
                 anime.id.hashCode(),
+                newIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        /**
+         * Returns [PendingIntent] that opens the anime info controller.
+         *
+         * @param context context of application
+         * @param anime anime of episode
+         */
+        internal fun openAudiobookChapterPendingActivity(context: Context, audiobook: Audiobook, groupId: Int): PendingIntent {
+            val newIntent =
+                Intent(context, MainActivity::class.java).setAction(Constants.SHORTCUT_ANIME)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    .putExtra(Constants.ANIME_EXTRA, audiobook.id)
+                    .putExtra("notificationId", audiobook.id.hashCode())
+                    .putExtra("groupId", groupId)
+            return PendingIntent.getActivity(
+                context,
+                audiobook.id.hashCode(),
                 newIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
@@ -668,6 +770,27 @@ class NotificationReceiver : BroadcastReceiver() {
             return PendingIntent.getBroadcast(
                 context,
                 anime.id.hashCode(),
+                newIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        internal fun markAsViewedPendingBroadcast(
+            context: Context,
+            audiobook: Audiobook,
+            chapters: Array<AudiobookChapter>,
+            groupId: Int,
+        ): PendingIntent {
+            val newIntent = Intent(context, NotificationReceiver::class.java).apply {
+                action = ACTION_MARK_AS_SEEN
+                putExtra(EXTRA_CHAPTER_URL, chapters.map { it.url }.toTypedArray())
+                putExtra(EXTRA_MANGA_ID, audiobook.id)
+                putExtra(EXTRA_NOTIFICATION_ID, audiobook.id.hashCode())
+                putExtra(EXTRA_GROUP_ID, groupId)
+            }
+            return PendingIntent.getBroadcast(
+                context,
+                audiobook.id.hashCode(),
                 newIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
@@ -793,6 +916,33 @@ class NotificationReceiver : BroadcastReceiver() {
         }
 
         /**
+         * Returns [PendingIntent] that downloads episodes
+         *
+         * @param context context of application
+         * @param anime anime of episode
+         */
+        internal fun downloadAudiobookChaptersPendingBroadcast(
+            context: Context,
+            audiobook: Audiobook,
+            chapters: Array<AudiobookChapter>,
+            groupId: Int,
+        ): PendingIntent {
+            val newIntent = Intent(context, NotificationReceiver::class.java).apply {
+                action = ACTION_DOWNLOAD_EPISODE
+                putExtra(EXTRA_CHAPTER_URL, chapters.map { it.url }.toTypedArray())
+                putExtra(EXTRA_MANGA_ID, audiobook.id)
+                putExtra(EXTRA_NOTIFICATION_ID, audiobook.id.hashCode())
+                putExtra(EXTRA_GROUP_ID, groupId)
+            }
+            return PendingIntent.getBroadcast(
+                context,
+                audiobook.id.hashCode(),
+                newIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        /**
          * Returns [PendingIntent] that starts a service which stops the library update
          *
          * @param context context of application
@@ -819,6 +969,24 @@ class NotificationReceiver : BroadcastReceiver() {
         internal fun cancelAnimelibUpdatePendingBroadcast(context: Context): PendingIntent {
             val intent = Intent(context, NotificationReceiver::class.java).apply {
                 action = ACTION_CANCEL_ANIMELIB_UPDATE
+            }
+            return PendingIntent.getBroadcast(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        /**
+         * Returns [PendingIntent] that starts a service which stops the library update
+         *
+         * @param context context of application
+         * @return [PendingIntent]
+         */
+        internal fun cancelAudiobooklibUpdatePendingBroadcast(context: Context): PendingIntent {
+            val intent = Intent(context, NotificationReceiver::class.java).apply {
+                action = ACTION_CANCEL_AUDIOBOOKLIB_UPDATE
             }
             return PendingIntent.getBroadcast(
                 context,

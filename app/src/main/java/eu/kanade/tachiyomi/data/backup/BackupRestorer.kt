@@ -424,7 +424,7 @@ class BackupRestorer(
     /**
      * Inserts list of chapters
      */
-    private suspend fun insertChapters(chapters: List<tachiyomi.domain.items.chapter.model.Chapter>) {
+    private suspend fun insertChapters(chapters: List<Chapter>) {
         mangaHandler.await(true) {
             chapters.forEach { chapter ->
                 chaptersQueries.insert(
@@ -448,7 +448,7 @@ class BackupRestorer(
      * Updates a list of chapters with known database ids
      */
     private suspend fun updateKnownChapters(
-        chapters: List<tachiyomi.domain.items.chapter.model.Chapter>,
+        chapters: List<Chapter>,
     ) {
         mangaHandler.await(true) {
             chapters.forEach { chapter ->

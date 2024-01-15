@@ -1,5 +1,8 @@
 package tachiyomi.domain.items.chapter.model
 
+import tachiyomi.domain.items.chapter.model.Chapter
+import tachiyomi.domain.items.chapter.model.ChapterUpdate
+
 data class ChapterUpdate(
     val id: Long,
     val mangaId: Long? = null,

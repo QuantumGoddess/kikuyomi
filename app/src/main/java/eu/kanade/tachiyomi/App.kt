@@ -31,6 +31,9 @@ import eu.kanade.tachiyomi.crash.GlobalExceptionHandler
 import eu.kanade.tachiyomi.data.coil.AnimeCoverFetcher
 import eu.kanade.tachiyomi.data.coil.AnimeCoverKeyer
 import eu.kanade.tachiyomi.data.coil.AnimeKeyer
+import eu.kanade.tachiyomi.data.coil.AudiobookCoverFetcher
+import eu.kanade.tachiyomi.data.coil.AudiobookCoverKeyer
+import eu.kanade.tachiyomi.data.coil.AudiobookKeyer
 import eu.kanade.tachiyomi.data.coil.MangaCoverFetcher
 import eu.kanade.tachiyomi.data.coil.MangaCoverKeyer
 import eu.kanade.tachiyomi.data.coil.MangaKeyer
@@ -163,11 +166,15 @@ class App : Application(), DefaultLifecycleObserver, ImageLoaderFactory {
                 add(TachiyomiImageDecoder.Factory())
                 add(MangaCoverFetcher.MangaFactory(lazy(callFactoryInit), lazy(diskCacheInit)))
                 add(AnimeCoverFetcher.AnimeFactory(lazy(callFactoryInit), lazy(diskCacheInit)))
+                add(AudiobookCoverFetcher.AudiobookFactory(lazy(callFactoryInit), lazy(diskCacheInit)))
                 add(AnimeCoverFetcher.AnimeCoverFactory(lazy(callFactoryInit), lazy(diskCacheInit)))
+                add(AudiobookCoverFetcher.AudiobookCoverFactory(lazy(callFactoryInit), lazy(diskCacheInit)))
                 add(AnimeKeyer())
+                add(AudiobookKeyer())
                 add(MangaCoverFetcher.MangaCoverFactory(lazy(callFactoryInit), lazy(diskCacheInit)))
                 add(MangaKeyer())
                 add(AnimeCoverKeyer())
+                add(AudiobookCoverKeyer())
                 add(MangaCoverKeyer())
             }
             callFactory(callFactoryInit)

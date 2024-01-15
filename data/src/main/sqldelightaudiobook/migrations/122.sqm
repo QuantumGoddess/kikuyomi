@@ -1,0 +1,31 @@
+DROP VIEW IF EXISTS audiobooklibView;
+
+CREATE VIEW audiobooklibView AS
+SELECT
+    A.*,
+    coalesce(E.total, 0) AS totalCount,
+    coalesce(E.readCount, 0) AS readCount,
+    coalesce(E.latestUpload, 0) AS latestUpload,
+    coalesce(E.fetchedAt, 0) AS chapterFetchedAt,
+    coalesce(E.lastRead, 0) AS lastRead,
+    coalesce(E.bookmarkCount, 0) AS bookmarkCount,
+    coalesce(AC.category_id, 0) AS category
+FROM audiobooks A
+LEFT JOIN(
+    SELECT
+        chapters.audiobook_id,
+        count(*) AS total,
+        sum(read) AS readCount,
+        coalesce(max(chapters.date_upload), 0) AS latestUpload,
+        coalesce(max(audiobookhistory.last_read), 0) AS lastRead,
+        coalesce(max(chapters.date_fetch), 0) AS fetchedAt,
+        sum(chapters.bookmark) AS bookmarkCount
+    FROM chapters
+    LEFT JOIN audiobookhistory
+    ON chapters._id = audiobookhistory.chapter_id
+    GROUP BY chapters.audiobook_id
+) AS E
+ON A._id = E.audiobook_id
+LEFT JOIN audiobooks_categories AS AC
+ON AC.audiobook_id = A._id
+WHERE A.favorite = 1;

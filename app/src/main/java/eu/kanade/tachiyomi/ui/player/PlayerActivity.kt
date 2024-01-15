@@ -47,6 +47,8 @@ import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
 import eu.kanade.tachiyomi.data.notification.NotificationReceiver
 import eu.kanade.tachiyomi.data.notification.Notifications
 import eu.kanade.tachiyomi.databinding.PlayerActivityBinding
+import eu.kanade.tachiyomi.ui.player.PlayerObserver
+import eu.kanade.tachiyomi.ui.player.PlayerViewModel
 import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
 import eu.kanade.tachiyomi.ui.player.settings.PlayerPreferences
 import eu.kanade.tachiyomi.ui.player.settings.PlayerSettingsScreenModel
@@ -105,7 +107,6 @@ import java.io.File
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import `is`.xyz.mpv.MPVView.Chapter as VideoChapter
-
 class PlayerActivity : BaseActivity() {
 
     internal val viewModel by viewModels<PlayerViewModel>()
@@ -1508,6 +1509,8 @@ class PlayerActivity : BaseActivity() {
             streams.subtitle.tracks = arrayOf(Track("nothing", "None")) + it.subtitleTracks.toTypedArray()
             streams.audio.tracks = arrayOf(Track("nothing", "None")) + it.audioTracks.toTypedArray()
             MPVLib.command(arrayOf("loadfile", parseVideoUrl(it.videoUrl)))
+            MPVLib.setPropertyString("vo", "gpu")
+
         }
         refreshUi()
     }

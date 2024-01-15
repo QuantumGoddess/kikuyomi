@@ -23,6 +23,17 @@
     </shortcut>
     <shortcut
         android:enabled="true"
+        android:icon="@drawable/sc_collections_baseline_48dp"
+        android:shortcutDisabledMessage="@string/app_not_available"
+        android:shortcutId="show_audiobooklib"
+        android:shortcutLongLabel="@string/label_audiobook_library"
+        android:shortcutShortLabel="@string/label_audiobook_library">
+        <intent
+            android:action="eu.kanade.tachiyomi.SHOW_AUDIOBOOKLIB"
+            android:targetClass="eu.kanade.tachiyomi.ui.main.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
         android:icon="@drawable/sc_new_releases_48dp"
         android:shortcutDisabledMessage="@string/app_not_available"
         android:shortcutId="show_recently_updated"

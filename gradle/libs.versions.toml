@@ -8,6 +8,7 @@ shizuku_version = "12.2.0"
 sqldelight = "2.0.0"
 sqlite = "2.4.0"
 voyager = "1.0.0"
+media3-session = "1.2.0"
 
 [libraries]
 desugar = "com.android.tools:desugar_jdk_libs:2.0.4"
@@ -102,6 +103,7 @@ arthenica-smartexceptions = "com.arthenica:smart-exception-java:0.1.1"
 seeker = "io.github.2307vivek:seeker:1.1.1"
 
 truetypeparser = "io.github.yubyf:truetypeparser-light:2.1.4"
+media3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media3-session" }
 
 [bundles]
 okhttp = ["okhttp-core", "okhttp-logging", "okhttp-brotli", "okhttp-dnsoverhttps"]

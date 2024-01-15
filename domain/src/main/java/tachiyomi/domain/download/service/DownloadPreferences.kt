@@ -42,6 +42,10 @@ class DownloadPreferences(
         "remove_exclude_anime_categories",
         emptySet(),
     )
+    fun removeExcludeAudiobookCategories() = preferenceStore.getStringSet(
+        "remove_exclude_audiobook_categories",
+        emptySet(),
+    )
 
     fun downloadNewChapters() = preferenceStore.getBoolean("download_new", false)
     fun downloadNewEpisodes() = preferenceStore.getBoolean("download_new_episode", false)

@@ -1,0 +1,28 @@
+DROP VIEW IF EXISTS audiobookhistoryView;
+
+/**
+ *  [audiobookhistory.chapter_number] had the wrong name.
+ */
+CREATE VIEW audiobookhistoryView AS
+SELECT
+    audiobookhistory._id AS id,
+    audiobooks._id AS audiobookId,
+    chapters._id AS chapterId,
+    audiobooks.title,
+    audiobooks.thumbnail_url AS thumbnailUrl,
+    chapters.chapter_number AS chapterNumber,
+    audiobookhistory.last_read AS readAt,
+    max_last_read.last_read AS maxReadAt,
+    max_last_read.chapter_id AS maxReadAtChapterId
+FROM audiobooks
+JOIN chapters
+ON audiobooks._id = chapters.audiobook_id
+JOIN audiobookhistory
+ON chapters._id = audiobookhistory.chapter_id
+JOIN (
+    SELECT chapters.audiobook_id,chapters._id AS chapter_id, MAX(audiobookhistory.last_read) AS last_read
+    FROM chapters JOIN audiobookhistory
+    ON chapters._id = audiobookhistory.chapter_id
+    GROUP BY chapters.audiobook_id
+) AS max_last_read
+ON chapters.audiobook_id = max_last_read.audiobook_id;

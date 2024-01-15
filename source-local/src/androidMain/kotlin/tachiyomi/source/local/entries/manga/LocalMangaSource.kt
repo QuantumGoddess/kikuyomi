@@ -32,7 +32,7 @@ import tachiyomi.core.util.lang.withIOContext
 import tachiyomi.core.util.system.ImageUtil
 import tachiyomi.core.util.system.logcat
 import tachiyomi.domain.entries.manga.model.Manga
-import tachiyomi.domain.items.chapter.service.ChapterRecognition
+import tachiyomi.domain.items.audiobookchapter.service.ChapterRecognition
 import tachiyomi.i18n.MR
 import tachiyomi.source.local.filter.manga.MangaOrderBy
 import tachiyomi.source.local.image.manga.LocalMangaCoverManager

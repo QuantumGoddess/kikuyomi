@@ -42,6 +42,7 @@ import eu.kanade.tachiyomi.ui.entries.anime.AnimeScreen
 import eu.kanade.tachiyomi.ui.entries.manga.MangaScreen
 import eu.kanade.tachiyomi.ui.history.HistoriesTab
 import eu.kanade.tachiyomi.ui.library.anime.AnimeLibraryTab
+import eu.kanade.tachiyomi.ui.library.audiobook.AudiobookLibraryTab
 import eu.kanade.tachiyomi.ui.library.manga.MangaLibraryTab
 import eu.kanade.tachiyomi.ui.more.MoreTab
 import eu.kanade.tachiyomi.ui.updates.UpdatesTab
@@ -73,34 +74,34 @@ object HomeScreen : Screen() {
 
     private val libraryPreferences: LibraryPreferences by injectLazy()
 
-    val tabsNoHistory = listOf(
+    val tabsShowHistory = listOf(
         AnimeLibraryTab,
         MangaLibraryTab,
-        UpdatesTab(fromMore = false, inMiddle = true),
-        BrowseTab(),
+        AudiobookLibraryTab,
+        HistoriesTab(false),
         MoreTab,
     )
 
-    val tabsNoUpdates = listOf(
+    val tabsShowUpdates = listOf(
         AnimeLibraryTab,
         MangaLibraryTab,
-        HistoriesTab(false),
-        BrowseTab(),
+        AudiobookLibraryTab,
+        UpdatesTab(false, false),
         MoreTab,
     )
 
-    val tabsNoManga = listOf(
+    val tabsShowBrowse = listOf(
         AnimeLibraryTab,
-        UpdatesTab(fromMore = false, inMiddle = false),
-        HistoriesTab(false),
+        MangaLibraryTab,
+        AudiobookLibraryTab,
         BrowseTab(),
         MoreTab,
     )
 
     var tabs = when (libraryPreferences.bottomNavStyle().get()) {
-        0 -> tabsNoHistory
-        1 -> tabsNoUpdates
-        else -> tabsNoManga
+        0 -> tabsShowBrowse
+        1 -> tabsShowUpdates
+        else -> tabsShowHistory
     }
 
     @Composable
@@ -190,6 +191,7 @@ object HomeScreen : Screen() {
                     openTabEvent.receiveAsFlow().collectLatest {
                         tabNavigator.current = when (it) {
                             is Tab.Animelib -> AnimeLibraryTab
+                            is Tab.Audiobooklib -> AudiobookLibraryTab
                             is Tab.Library -> MangaLibraryTab
                             is Tab.Updates -> UpdatesTab(
                                 libraryPreferences.bottomNavStyle().get() == 1,
@@ -343,6 +345,7 @@ object HomeScreen : Screen() {
 
     sealed interface Tab {
         data class Animelib(val animeIdToOpen: Long? = null) : Tab
+        data class Audiobooklib(val audiobookIdToOpen: Long? = null) : Tab
         data class Library(val mangaIdToOpen: Long? = null) : Tab
         data object Updates : Tab
         data object History : Tab

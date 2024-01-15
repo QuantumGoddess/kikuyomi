@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.ui.player.viewer
 
 import android.os.Build
 import dev.icerock.moko.resources.StringResource
+import eu.kanade.tachiyomi.ui.player.viewer.PipState
 import tachiyomi.i18n.MR
 
 /**

@@ -1,0 +1,49 @@
+ALTER TABLE audiobooks ADD COLUMN last_modified_at INTEGER AS Long NOT NULL DEFAULT 0;
+ALTER TABLE audiobooks ADD COLUMN favorite_modified_at INTEGER AS Long;
+ALTER TABLE audiobooks_categories ADD COLUMN last_modified_at INTEGER AS Long NOT NULL DEFAULT 0;
+ALTER TABLE chapters ADD COLUMN last_modified_at INTEGER AS Long NOT NULL DEFAULT 0;
+
+UPDATE audiobooks SET last_modified_at = strftime('%s', 'now');
+UPDATE audiobooks SET favorite_modified_at = strftime('%s', 'now') WHERE favorite = 1;
+UPDATE audiobooks_categories SET last_modified_at = strftime('%s', 'now');
+UPDATE chapters SET last_modified_at = strftime('%s', 'now');
+
+-- Create triggers
+DROP TRIGGER IF EXISTS update_last_modified_at_audiobooks;
+CREATE TRIGGER update_last_modified_at_audiobooks
+AFTER UPDATE ON audiobooks
+FOR EACH ROW
+BEGIN
+  UPDATE audiobooks
+  SET last_modified_at = strftime('%s', 'now')
+  WHERE _id = new._id;
+END;
+
+DROP TRIGGER IF EXISTS update_favorite_modified_at_audiobooks;
+CREATE TRIGGER update_last_favorited_at_audiobooks
+AFTER UPDATE OF favorite ON audiobooks
+BEGIN
+  UPDATE audiobooks
+  SET favorite_modified_at = strftime('%s', 'now')
+  WHERE _id = new._id;
+END;
+
+DROP TRIGGER IF EXISTS update_last_modified_at_chapters;
+CREATE TRIGGER update_last_modified_at_chapters
+AFTER UPDATE ON chapters
+FOR EACH ROW
+BEGIN
+  UPDATE chapters
+  SET last_modified_at = strftime('%s', 'now')
+  WHERE _id = new._id;
+END;
+
+DROP TRIGGER IF EXISTS update_last_modified_at_audiobooks_categories;
+CREATE TRIGGER update_last_modified_at_audiobooks_categories
+AFTER UPDATE ON audiobooks_categories
+FOR EACH ROW
+BEGIN
+  UPDATE audiobooks_categories
+  SET last_modified_at = strftime('%s', 'now')
+  WHERE _id = new._id;
+END;

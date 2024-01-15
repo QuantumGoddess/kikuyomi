@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import eu.kanade.presentation.components.AdaptiveSheet
 import eu.kanade.tachiyomi.ui.player.settings.PlayerSettingsScreenModel
-import eu.kanade.tachiyomi.ui.player.viewer.HwDecState
-import eu.kanade.tachiyomi.ui.player.viewer.PlayerStatsPage
+import eu.kanade.tachiyomi.ui.audioplayer.viewer.HwDecState
+import eu.kanade.tachiyomi.ui.audioplayer.viewer.PlayerStatsPage
 import `is`.xyz.mpv.MPVLib
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.padding

@@ -1,7 +1,7 @@
 package eu.kanade.tachiyomi.ui.player.settings
 
-import eu.kanade.tachiyomi.ui.player.viewer.AspectState
-import eu.kanade.tachiyomi.ui.player.viewer.HwDecState
+import eu.kanade.tachiyomi.ui.audioplayer.viewer.AspectState
+import eu.kanade.tachiyomi.ui.audioplayer.viewer.HwDecState
 import tachiyomi.core.preference.PreferenceStore
 
 class PlayerPreferences(

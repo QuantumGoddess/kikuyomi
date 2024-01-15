@@ -31,6 +31,7 @@ class StorageManager(
             parent.createDirectory(AUTOMATIC_BACKUPS_PATH)
             parent.createDirectory(LOCAL_SOURCE_PATH)
             parent.createDirectory(LOCAL_ANIMESOURCE_PATH)
+            parent.createDirectory(LOCAL_AUDIOBOOKSOURCE_PATH)
             parent.createDirectory(FONTS_PATH)
             parent.createDirectory(DOWNLOADS_PATH).also {
                 DiskUtil.createNoMediaFile(it, context)
@@ -54,6 +55,10 @@ class StorageManager(
         return baseDir?.createDirectory(LOCAL_ANIMESOURCE_PATH)
     }
 
+    fun getLocalAudiobookSourceDirectory(): UniFile? {
+        return baseDir?.createDirectory(LOCAL_AUDIOBOOKSOURCE_PATH)
+    }
+
     fun getFontsDirectory(): UniFile? {
         return baseDir?.createDirectory(FONTS_PATH)
     }
@@ -63,4 +68,5 @@ private const val AUTOMATIC_BACKUPS_PATH = "autobackup"
 private const val DOWNLOADS_PATH = "downloads"
 private const val LOCAL_SOURCE_PATH = "local"
 private const val LOCAL_ANIMESOURCE_PATH = "localanime"
+private const val LOCAL_AUDIOBOOKSOURCE_PATH = "localaudiobooks"
 private const val FONTS_PATH = "fonts"

@@ -20,6 +20,10 @@ import eu.kanade.tachiyomi.ui.browse.anime.extension.animeExtensionsTab
 import eu.kanade.tachiyomi.ui.browse.anime.migration.sources.migrateAnimeSourceTab
 import eu.kanade.tachiyomi.ui.browse.anime.source.animeSourcesTab
 import eu.kanade.tachiyomi.ui.browse.anime.source.globalsearch.GlobalAnimeSearchScreen
+import eu.kanade.tachiyomi.ui.browse.audiobook.extension.AudiobookExtensionsScreenModel
+import eu.kanade.tachiyomi.ui.browse.audiobook.extension.audiobookExtensionsTab
+import eu.kanade.tachiyomi.ui.browse.audiobook.migration.sources.migrateAudiobookSourceTab
+import eu.kanade.tachiyomi.ui.browse.audiobook.source.audiobookSourcesTab
 import eu.kanade.tachiyomi.ui.browse.manga.extension.MangaExtensionsScreenModel
 import eu.kanade.tachiyomi.ui.browse.manga.extension.mangaExtensionsTab
 import eu.kanade.tachiyomi.ui.browse.manga.migration.sources.migrateMangaSourceTab
@@ -61,21 +65,29 @@ data class BrowseTab(
         val animeExtensionsScreenModel = rememberScreenModel { AnimeExtensionsScreenModel() }
         val animeExtensionsState by animeExtensionsScreenModel.state.collectAsState()
 
+        val audiobookExtensionsScreenModel = rememberScreenModel { AudiobookExtensionsScreenModel() }
+        val audiobookExtensionsState by audiobookExtensionsScreenModel.state.collectAsState()
+
         TabbedScreen(
             titleRes = MR.strings.browse,
             tabs = persistentListOf(
                 animeSourcesTab(),
                 mangaSourcesTab(),
+                audiobookSourcesTab(),
                 animeExtensionsTab(animeExtensionsScreenModel),
                 mangaExtensionsTab(mangaExtensionsScreenModel),
+                audiobookExtensionsTab(audiobookExtensionsScreenModel),
                 migrateAnimeSourceTab(),
                 migrateMangaSourceTab(),
+                migrateAudiobookSourceTab(),
             ),
             startIndex = 2.takeIf { toExtensions },
             mangaSearchQuery = mangaExtensionsState.searchQuery,
             onChangeMangaSearchQuery = mangaExtensionsScreenModel::search,
             animeSearchQuery = animeExtensionsState.searchQuery,
             onChangeAnimeSearchQuery = animeExtensionsScreenModel::search,
+            audiobookSearchQuery = audiobookExtensionsState.searchQuery,
+            onChangeAudiobookSearchQuery = audiobookExtensionsScreenModel::search,
             scrollable = true,
         )
 

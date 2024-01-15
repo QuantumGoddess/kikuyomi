@@ -1,0 +1,58 @@
+CREATE TABLE audiobook_sync(
+    _id INTEGER NOT NULL PRIMARY KEY,
+    audiobook_id INTEGER NOT NULL,
+    sync_id INTEGER NOT NULL,
+    remote_id INTEGER NOT NULL,
+    library_id INTEGER,
+    title TEXT NOT NULL,
+    last_chapter_read REAL NOT NULL,
+    total_chapters INTEGER NOT NULL,
+    status INTEGER NOT NULL,
+    score REAL NOT NULL,
+    remote_url TEXT NOT NULL,
+    start_date INTEGER NOT NULL,
+    finish_date INTEGER NOT NULL,
+    UNIQUE (audiobook_id, sync_id) ON CONFLICT REPLACE,
+    FOREIGN KEY(audiobook_id) REFERENCES audiobooks (_id)
+    ON DELETE CASCADE
+);
+
+delete:
+DELETE FROM audiobook_sync
+WHERE audiobook_id = :audiobookId AND sync_id = :syncId;
+
+getAudiobookTracks:
+SELECT *
+FROM audiobook_sync;
+
+getTrackByAudiobookId:
+SELECT *
+FROM audiobook_sync
+WHERE _id = :id;
+
+
+getTracksByAudiobookId:
+SELECT *
+FROM audiobook_sync
+WHERE audiobook_id = :audiobookId;
+
+insert:
+INSERT INTO audiobook_sync(audiobook_id,sync_id,remote_id,library_id,title,last_chapter_read,total_chapters,status,score,remote_url,start_date,finish_date)
+VALUES (:audiobookId,:syncId,:remoteId,:libraryId,:title,:lastChapterRead,:totalChapters,:status,:score,:remoteUrl,:startDate,:finishDate);
+
+update:
+UPDATE audiobook_sync
+SET
+    audiobook_id = coalesce(:audiobookId, audiobook_id),
+    sync_id = coalesce(:syncId, sync_id),
+    remote_id = coalesce(:mediaId, remote_id),
+    library_id = coalesce(:libraryId, library_id),
+    title = coalesce(:title, title),
+    last_chapter_read = coalesce(:lastChapterRead, last_chapter_read),
+    total_chapters = coalesce(:totalChapters, total_chapters),
+    status = coalesce(:status, status),
+    score = coalesce(:score, score),
+    remote_url = coalesce(:trackingUrl, remote_url),
+    start_date = coalesce(:startDate, start_date),
+    finish_date = coalesce(:finishDate, finish_date)
+WHERE _id = :id;

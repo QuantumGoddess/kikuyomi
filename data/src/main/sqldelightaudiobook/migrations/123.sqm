@@ -1,0 +1,24 @@
+DROP VIEW IF EXISTS audiobookupdatesView;
+
+CREATE VIEW audiobookupdatesView AS
+SELECT
+    audiobooks._id AS audiobookId,
+    audiobooks.title AS audiobookTitle,
+    chapters._id AS chapterId,
+    chapters.name AS chapterName,
+    chapters.scanlator,
+    chapters.read,
+    chapters.bookmark,
+    chapters.last_second_read,
+    chapters.total_seconds AS totalSeconds,
+    audiobooks.source,
+    audiobooks.favorite,
+    audiobooks.thumbnail_url AS thumbnailUrl,
+    audiobooks.cover_last_modified AS coverLastModified,
+    chapters.date_upload AS dateUpload,
+    chapters.date_fetch AS datefetch
+FROM audiobooks JOIN chapters
+ON audiobooks._id = chapters.audiobook_id
+WHERE favorite = 1
+AND date_fetch > date_added
+ORDER BY date_fetch DESC;

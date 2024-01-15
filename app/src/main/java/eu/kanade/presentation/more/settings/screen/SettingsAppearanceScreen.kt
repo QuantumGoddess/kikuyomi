@@ -137,9 +137,9 @@ object SettingsAppearanceScreen : SearchableSettings {
                 .drop(1)
                 .collectLatest { value ->
                     HomeScreen.tabs = when (value) {
-                        0 -> HomeScreen.tabsNoHistory
-                        1 -> HomeScreen.tabsNoUpdates
-                        else -> HomeScreen.tabsNoManga
+                        0 -> HomeScreen.tabsShowUpdates
+                        1 -> HomeScreen.tabsShowBrowse
+                        else -> HomeScreen.tabsShowHistory
                     }
                     (context as? Activity)?.let {
                         ActivityCompat.recreate(it)

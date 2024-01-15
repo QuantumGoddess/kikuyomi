@@ -26,7 +26,7 @@ fun Screen.migrateMangaSourceTab(): TabContent {
     val state by screenModel.state.collectAsState()
 
     return TabContent(
-        titleRes = MR.strings.label_migration,
+        titleRes = MR.strings.label_migration_manga,
         actions = persistentListOf(
             AppBar.Action(
                 title = stringResource(MR.strings.migration_help_guide),

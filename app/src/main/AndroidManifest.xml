@@ -26,6 +26,7 @@
     <uses-permission android:name="android.permission.READ_APP_SPECIFIC_LOCALES" />
     
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:name=".App"
@@ -78,6 +79,33 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="eu.kanade.tachiyomi.ANIMESEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
+        <activity
+            android:name=".ui.deeplink.audiobook.DeepLinkAudiobookActivity"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:label="@string/action_global_anime_search"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <action android:name="com.google.android.gms.actions.SEARCH_ACTION" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="eu.kanade.tachiyomi.AUDIOBOOKSEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
@@ -150,6 +178,22 @@
                 android:resource="@xml/s_pen_actions"/>
         </activity>
         <activity
+            android:name=".ui.audioplayer.AudioplayerActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize|keyboardHidden|keyboard"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:exported="false"
+            tools:targetApi="n">
+            <intent-filter>
+                <action android:name="com.samsung.android.support.REMOTE_ACTION" />
+            </intent-filter>
+
+            <meta-data android:name="com.samsung.android.support.REMOTE_ACTION"
+                android:resource="@xml/s_pen_actions"/>
+        </activity>
+        <activity
             android:name=".ui.security.UnlockActivity"
             android:theme="@style/Theme.Tachiyomi"
             android:exported="false" />
@@ -166,6 +210,11 @@
 
         <activity
             android:name=".extension.anime.util.AnimeExtensionInstallActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:exported="false" />
+
+        <activity
+            android:name=".extension.audiobook.util.AudiobookExtensionInstallActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:exported="false" />
 
@@ -201,6 +250,14 @@
             android:name=".data.notification.NotificationReceiver"
             android:exported="false" />
 
+        <receiver android:name="is.xyz.mpv.NotificationButtonReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="is.xyz.mpv.PLAY_PAUSE" />
+                <action android:name="is.xyz.mpv.ACTION_PREV" />
+                <action android:name="is.xyz.mpv.ACTION_NEXT" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".extension.util.ExtensionInstallService"
             android:exported="false" />
@@ -211,6 +268,10 @@
 
         <service
             android:name=".extension.anime.util.AnimeExtensionInstallService"
+            android:exported="false" />
+
+        <service
+            android:name=".extension.audiobook.util.AudiobookExtensionInstallService"
             android:exported="false" />
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
@@ -225,6 +286,11 @@
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
+
+        <service
+            android:name=".ui.audioplayer.AudioplayerBackgroundService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

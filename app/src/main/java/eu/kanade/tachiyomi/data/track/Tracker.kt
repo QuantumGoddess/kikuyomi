@@ -46,6 +46,9 @@ interface Tracker {
     val animeService: AnimeTracker
         get() = this as AnimeTracker
 
+    val audiobookService: AudiobookTracker
+        get() = this as AudiobookTracker
+
     val mangaService: MangaTracker
         get() = this as MangaTracker
 }

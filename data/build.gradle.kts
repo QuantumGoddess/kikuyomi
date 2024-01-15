@@ -28,6 +28,12 @@ android {
                 schemaOutputDirectory.set(project.file("./src/main/sqldelightanime"))
                 srcDirs.from(project.file("./src/main/sqldelightanime"))
             }
+            create("AudiobookDatabase") {
+                packageName.set("kikuyomi.data")
+                dialect(libs.sqldelight.dialects.sql)
+                schemaOutputDirectory.set(project.file("./src/main/sqldelightaudiobook"))
+                srcDirs.from(project.file("./src/main/sqldelightaudiobook"))
+            }
         }
     }
 }

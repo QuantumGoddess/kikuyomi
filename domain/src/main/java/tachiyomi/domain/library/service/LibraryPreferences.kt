@@ -5,8 +5,10 @@ import tachiyomi.core.preference.PreferenceStore
 import tachiyomi.core.preference.TriState
 import tachiyomi.core.preference.getEnum
 import tachiyomi.domain.entries.anime.model.Anime
+import tachiyomi.domain.entries.audiobook.model.Audiobook
 import tachiyomi.domain.entries.manga.model.Manga
 import tachiyomi.domain.library.anime.model.AnimeLibrarySort
+import tachiyomi.domain.library.audiobook.model.AudiobookLibrarySort
 import tachiyomi.domain.library.manga.model.MangaLibrarySort
 import tachiyomi.domain.library.model.LibraryDisplayMode
 
@@ -40,6 +42,13 @@ class LibraryPreferences(
         AnimeLibrarySort.default,
         AnimeLibrarySort.Serializer::serialize,
         AnimeLibrarySort.Serializer::deserialize,
+    )
+
+    fun audiobookSortingMode() = preferenceStore.getObject(
+        "audiobooklib_sorting_mode",
+        AudiobookLibrarySort.default,
+        AudiobookLibrarySort.Serializer::serialize,
+        AudiobookLibrarySort.Serializer::deserialize,
     )
 
     fun lastUpdatedTimestamp() = preferenceStore.getLong(Preference.appStateKey("library_update_last_timestamp"), 0L)
@@ -94,15 +103,19 @@ class LibraryPreferences(
     // Mixture Columns
 
     fun animePortraitColumns() = preferenceStore.getInt("pref_animelib_columns_portrait_key", 0)
+    fun audiobookPortraitColumns() = preferenceStore.getInt("pref_audiobooklib_columns_portrait_key", 0)
     fun mangaPortraitColumns() = preferenceStore.getInt("pref_library_columns_portrait_key", 0)
 
     fun animeLandscapeColumns() = preferenceStore.getInt("pref_animelib_columns_landscape_key", 0)
+    fun audiobookLandscapeColumns() = preferenceStore.getInt("pref_audiobooklib_columns_landscape_key", 0)
     fun mangaLandscapeColumns() = preferenceStore.getInt("pref_library_columns_landscape_key", 0)
 
     // Mixture Filter
 
     fun filterDownloadedAnime() =
         preferenceStore.getEnum("pref_filter_animelib_downloaded_v2", TriState.DISABLED)
+    fun filterDownloadedAudiobooks() =
+        preferenceStore.getEnum("pref_filter_audiobooklib_downloaded_v2", TriState.DISABLED)
 
     fun filterDownloadedManga() =
         preferenceStore.getEnum("pref_filter_library_downloaded_v2", TriState.DISABLED)
@@ -115,18 +128,24 @@ class LibraryPreferences(
 
     fun filterStartedAnime() =
         preferenceStore.getEnum("pref_filter_animelib_started_v2", TriState.DISABLED)
+    fun filterStartedAudiobooks() =
+        preferenceStore.getEnum("pref_filter_audiobooklib_started_v2", TriState.DISABLED)
 
     fun filterStartedManga() =
         preferenceStore.getEnum("pref_filter_library_started_v2", TriState.DISABLED)
 
     fun filterBookmarkedAnime() =
         preferenceStore.getEnum("pref_filter_animelib_bookmarked_v2", TriState.DISABLED)
+    fun filterBookmarkedAudiobooks() =
+        preferenceStore.getEnum("pref_filter_audiobooklib_bookmarked_v2", TriState.DISABLED)
 
     fun filterBookmarkedManga() =
         preferenceStore.getEnum("pref_filter_library_bookmarked_v2", TriState.DISABLED)
 
     fun filterCompletedAnime() =
         preferenceStore.getEnum("pref_filter_animelib_completed_v2", TriState.DISABLED)
+    fun filterCompletedAudiobooks() =
+        preferenceStore.getEnum("pref_filter_audiobooklib_completed_v2", TriState.DISABLED)
 
     fun filterCompletedManga() =
         preferenceStore.getEnum("pref_filter_library_completed_v2", TriState.DISABLED)
@@ -183,6 +202,8 @@ class LibraryPreferences(
 
     fun filterTrackedAnime(id: Int) =
         preferenceStore.getEnum("pref_filter_animelib_tracked_${id}_v2", TriState.DISABLED)
+    fun filterTrackedAudiobooks(id: Int) =
+        preferenceStore.getEnum("pref_filter_audiobooklib_tracked_${id}_v2", TriState.DISABLED)
 
     fun filterTrackedManga(id: Int) =
         preferenceStore.getEnum("pref_filter_library_tracked_${id}_v2", TriState.DISABLED)
@@ -191,23 +212,30 @@ class LibraryPreferences(
 
     fun newMangaUpdatesCount() = preferenceStore.getInt("library_unread_updates_count", 0)
     fun newAnimeUpdatesCount() = preferenceStore.getInt("library_unseen_updates_count", 0)
+    fun newAudiobookUpdatesCount() = preferenceStore.getInt("library_unreadaudiobook_updates_count", 0)
 
     // Mixture Category
 
     fun defaultAnimeCategory() = preferenceStore.getInt("default_anime_category", -1)
+    fun defaultAudiobookCategory() = preferenceStore.getInt("default_audiobook_category", -1)
     fun defaultMangaCategory() = preferenceStore.getInt("default_category", -1)
 
     fun lastUsedAnimeCategory() = preferenceStore.getInt(Preference.appStateKey("last_used_anime_category"), 0)
+    fun lastUsedAudiobookCategory() = preferenceStore.getInt(Preference.appStateKey("last_used_audiobook_category"), 0)
     fun lastUsedMangaCategory() = preferenceStore.getInt(Preference.appStateKey("last_used_category"), 0)
 
     fun animeUpdateCategories() =
         preferenceStore.getStringSet("animelib_update_categories", emptySet())
+    fun audiobookUpdateCategories() =
+        preferenceStore.getStringSet("audiobooklib_update_categories", emptySet())
 
     fun mangaUpdateCategories() =
         preferenceStore.getStringSet("library_update_categories", emptySet())
 
     fun animeUpdateCategoriesExclude() =
         preferenceStore.getStringSet("animelib_update_categories_exclude", emptySet())
+    fun audiobookUpdateCategoriesExclude() =
+        preferenceStore.getStringSet("audiobooklib_update_categories_exclude", emptySet())
 
     fun mangaUpdateCategoriesExclude() =
         preferenceStore.getStringSet("library_update_categories_exclude", emptySet())
@@ -282,6 +310,17 @@ class LibraryPreferences(
         displayChapterByNameOrNumber().set(manga.displayMode)
         sortChapterByAscendingOrDescending().set(
             if (manga.sortDescending()) Manga.CHAPTER_SORT_DESC else Manga.CHAPTER_SORT_ASC,
+        )
+    }
+
+    fun setAudiobookChapterSettingsDefault(audiobook: Audiobook) {
+        filterChapterByRead().set(audiobook.unreadFilterRaw)
+        filterChapterByDownloaded().set(audiobook.downloadedFilterRaw)
+        filterChapterByBookmarked().set(audiobook.bookmarkedFilterRaw)
+        sortChapterBySourceOrNumber().set(audiobook.sorting)
+        displayChapterByNameOrNumber().set(audiobook.displayMode)
+        sortChapterByAscendingOrDescending().set(
+            if (audiobook.sortDescending()) Manga.CHAPTER_SORT_DESC else Manga.CHAPTER_SORT_ASC,
         )
     }
 
