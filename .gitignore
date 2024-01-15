@@ -16,3 +16,4 @@ app/**/output.json
 
 # Unnecessary file
 *.swp
+*.log
