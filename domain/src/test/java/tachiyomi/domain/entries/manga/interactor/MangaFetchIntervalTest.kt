@@ -5,7 +5,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
-import tachiyomi.domain.items.audiobookchapter.model.Chapter
+import tachiyomi.domain.items.chapter.model.Chapter
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import kotlin.time.Duration

@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
-import tachiyomi.domain.items.audiobookchapter.service.ChapterRecognition
+import tachiyomi.domain.items.chapter.service.ChapterRecognition
 
 @Execution(ExecutionMode.CONCURRENT)
 class ChapterRecognitionTest {

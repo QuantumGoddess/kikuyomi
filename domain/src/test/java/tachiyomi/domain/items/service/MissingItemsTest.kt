@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
-import tachiyomi.domain.items.audiobookchapter.model.Chapter
+import tachiyomi.domain.items.chapter.model.Chapter
 import tachiyomi.domain.items.chapter.service.calculateChapterGap
 import tachiyomi.domain.items.chapter.service.missingChaptersCount
 import tachiyomi.domain.items.episode.model.Episode
